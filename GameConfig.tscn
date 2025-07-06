@@ -1,0 +1,183 @@
+[gd_scene load_steps=15 format=3 uid="uid://cbg7jgkyc4rv"]
+
+[ext_resource type="Script" uid="uid://dhidw37noa530" path="res://assets/scripts/game_config.gd" id="1_p6hjs"]
+[ext_resource type="Theme" uid="uid://d4j2qqvqmtl6w" path="res://Military.tres" id="1_v4868"]
+[ext_resource type="Texture2D" uid="uid://b1xa24akd0whh" path="res://battleship assets.png" id="2_j40rj"]
+[ext_resource type="Texture2D" uid="uid://86w68vb5nba8" path="res://assets/background_image.png" id="3_s5dcv"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_lylau"]
+texture = ExtResource("3_s5dcv")
+modulate_color = Color(0.2484, 0.2484, 0.2484, 1)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_v4868"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j40rj"]
+atlas = ExtResource("2_j40rj")
+region = Rect2(497, 2349, 1444, 553)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_ml0eg"]
+atlas = ExtResource("2_j40rj")
+region = Rect2(3571, 2349, 1443, 529)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_mv17u"]
+atlas = ExtResource("2_j40rj")
+region = Rect2(2055, 2349, 1444, 537)
+
+[sub_resource type="InputEventKey" id="InputEventKey_ml0eg"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_mv17u"]
+events = [SubResource("InputEventKey_ml0eg")]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v4868"]
+atlas = ExtResource("2_j40rj")
+region = Rect2(497, 3592, 1444, 552)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_s5dcv"]
+atlas = ExtResource("2_j40rj")
+region = Rect2(3571, 3592, 1443, 529)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_lylau"]
+atlas = ExtResource("2_j40rj")
+region = Rect2(2055, 3592, 1444, 536)
+
+[node name="GameConfig" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_v4868")
+script = ExtResource("1_p6hjs")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_lylau")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 0
+theme = ExtResource("1_v4868")
+theme_override_font_sizes/font_size = 72
+text = "Configure Game"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 50
+theme_override_styles/separator = SubResource("StyleBoxEmpty_v4868")
+
+[node name="GridContainer" type="GridContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/h_separation = 26
+theme_override_constants/v_separation = 13
+columns = 2
+
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme = ExtResource("1_v4868")
+theme_override_font_sizes/font_size = 28
+text = "Grid Size:"
+
+[node name="GridSizeOption" type="OptionButton" parent="MarginContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme = ExtResource("1_v4868")
+alignment = 1
+selected = 1
+item_count = 3
+popup/item_0/text = "8 x 8"
+popup/item_0/id = 0
+popup/item_1/text = "10 x 10"
+popup/item_1/id = 1
+popup/item_2/text = "12 x 12"
+popup/item_2/id = 2
+
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Number of players:"
+
+[node name="NumberOfPlayersOption" type="OptionButton" parent="MarginContainer/VBoxContainer/GridContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+theme = ExtResource("1_v4868")
+alignment = 1
+selected = 0
+item_count = 2
+popup/item_0/text = "Player vs Player"
+popup/item_0/id = 0
+popup/item_1/text = "Player vs Computer"
+popup/item_1/id = 1
+
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/GridContainer"]
+visible = false
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Difficulty:"
+
+[node name="DifficultyOption" type="OptionButton" parent="MarginContainer/VBoxContainer/GridContainer"]
+visible = false
+layout_mode = 2
+selected = 0
+item_count = 4
+popup/item_0/text = "Easy"
+popup/item_0/id = 0
+popup/item_1/text = "Medium"
+popup/item_1/id = 1
+popup/item_2/text = "Hard"
+popup/item_2/id = 2
+popup/item_3/text = "Impossible"
+popup/item_3/id = 3
+
+[node name="PlayButtonTexture" type="TextureButton" parent="MarginContainer"]
+custom_minimum_size = Vector2(180, 75)
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+texture_normal = SubResource("AtlasTexture_j40rj")
+texture_pressed = SubResource("AtlasTexture_ml0eg")
+texture_hover = SubResource("AtlasTexture_mv17u")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="BackButtonTexture" type="TextureButton" parent="MarginContainer"]
+custom_minimum_size = Vector2(180, 75)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+shortcut = SubResource("Shortcut_mv17u")
+texture_normal = SubResource("AtlasTexture_v4868")
+texture_pressed = SubResource("AtlasTexture_s5dcv")
+texture_hover = SubResource("AtlasTexture_lylau")
+ignore_texture_size = true
+stretch_mode = 5
+
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/GridContainer/NumberOfPlayersOption" to="." method="_on_number_of_players_option_item_selected"]
+[connection signal="pressed" from="MarginContainer/PlayButtonTexture" to="." method="_on_play_button_pressed"]
+[connection signal="pressed" from="MarginContainer/BackButtonTexture" to="." method="_on_back_button_pressed"]

@@ -1,0 +1,424 @@
+[gd_scene load_steps=18 format=3 uid="uid://db3sa5sk7kq0g"]
+
+[ext_resource type="Script" uid="uid://dvoodcfcrtgdb" path="res://assets/scripts/playing.gd" id="1_4vsio"]
+[ext_resource type="Theme" uid="uid://d4j2qqvqmtl6w" path="res://Military.tres" id="2_di1ht"]
+[ext_resource type="Texture2D" uid="uid://b1xa24akd0whh" path="res://battleship assets.png" id="3_e0ree"]
+
+[sub_resource type="Environment" id="Environment_1541i"]
+background_mode = 1
+background_color = Color(0.17054, 0.448609, 0.659749, 1)
+ambient_light_color = Color(0.10971, 0.276931, 0.468962, 1)
+
+[sub_resource type="InputEventKey" id="InputEventKey_oshmb"]
+device = -1
+keycode = 4194305
+
+[sub_resource type="Shortcut" id="Shortcut_dbt5k"]
+events = [SubResource("InputEventKey_oshmb")]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_32ixm"]
+atlas = ExtResource("3_e0ree")
+region = Rect2(1936, 332, 454, 494)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_nk3gh"]
+atlas = ExtResource("3_e0ree")
+region = Rect2(3171, 330, 455, 475)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_cltlh"]
+atlas = ExtResource("3_e0ree")
+region = Rect2(2560, 332, 455, 479)
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_4v328"]
+bg_color = Color(0.0901961, 0.172549, 0.133333, 0.85098)
+
+[sub_resource type="StyleBoxEmpty" id="StyleBoxEmpty_0n8lc"]
+
+[sub_resource type="Shader" id="Shader_di1ht"]
+code = "// NOTE: Shader automatically converted from Godot Engine 4.4.1.stable's StandardMaterial3D.
+
+shader_type spatial;
+render_mode blend_mix, depth_draw_always, cull_back, diffuse_burley, specular_schlick_ggx;
+
+uniform vec4 albedo : source_color;
+uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
+uniform ivec2 albedo_texture_size;
+uniform float point_size : hint_range(0.1, 128.0, 0.1);
+
+uniform float roughness : hint_range(0.0, 1.0);
+uniform sampler2D texture_metallic : hint_default_white, filter_linear_mipmap, repeat_enable;
+uniform vec4 metallic_texture_channel;
+uniform sampler2D texture_roughness : hint_roughness_r, filter_linear_mipmap, repeat_enable;
+
+uniform float specular : hint_range(0.0, 1.0, 0.01);
+uniform float metallic : hint_range(0.0, 1.0, 0.01);
+
+uniform sampler2D texture_refraction : filter_linear_mipmap, repeat_enable;
+uniform float refraction : hint_range(-1.0, 1.0, 0.001);
+uniform vec4 refraction_texture_channel;
+uniform sampler2D screen_texture : hint_screen_texture, repeat_disable, filter_linear_mipmap;
+uniform sampler2D depth_texture : hint_depth_texture, repeat_disable, filter_nearest;
+
+uniform sampler2D texture_normal : hint_roughness_normal, filter_linear_mipmap, repeat_enable;
+uniform float normal_scale : hint_range(-16.0, 16.0);
+varying vec3 uv1_triplanar_pos;
+
+uniform float uv1_blend_sharpness : hint_range(0.0, 150.0, 0.001);
+varying vec3 uv1_power_normal;
+
+uniform vec3 uv1_scale;
+uniform vec3 uv1_offset;
+uniform vec3 uv2_scale;
+uniform vec3 uv2_offset;
+
+void vertex() {
+	vec3 normal = MODEL_NORMAL_MATRIX * NORMAL;
+
+	TANGENT = vec3(0.0, 0.0, -1.0) * abs(normal.x);
+	TANGENT += vec3(1.0, 0.0, 0.0) * abs(normal.y);
+	TANGENT += vec3(1.0, 0.0, 0.0) * abs(normal.z);
+	TANGENT = inverse(MODEL_NORMAL_MATRIX) * normalize(TANGENT);
+
+	BINORMAL = vec3(0.0, 1.0, 0.0) * abs(normal.x);
+	BINORMAL += vec3(0.0, 0.0, -1.0) * abs(normal.y);
+	BINORMAL += vec3(0.0, 1.0, 0.0) * abs(normal.z);
+	BINORMAL = inverse(MODEL_NORMAL_MATRIX) * normalize(BINORMAL);
+
+	// UV1 Triplanar: Enabled (with World Triplanar)
+	uv1_power_normal = pow(abs(normal), vec3(uv1_blend_sharpness));
+	uv1_triplanar_pos = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz * uv1_scale + uv1_offset + TIME * 0.02;
+	uv1_power_normal /= dot(uv1_power_normal, vec3(1.0));
+	uv1_triplanar_pos *= vec3(1.0, -1.0, 1.0);
+}
+
+vec4 triplanar_texture(sampler2D p_sampler, vec3 p_weights, vec3 p_triplanar_pos) {
+	vec4 samp = vec4(0.0);
+	samp += texture(p_sampler, p_triplanar_pos.xy) * p_weights.z;
+	samp += texture(p_sampler, p_triplanar_pos.xz) * p_weights.y;
+	samp += texture(p_sampler, p_triplanar_pos.zy * vec2(-1.0, 1.0)) * p_weights.x;
+	return samp;
+}
+
+void fragment() {
+	vec4 albedo_tex = triplanar_texture(texture_albedo, uv1_power_normal, uv1_triplanar_pos);
+	ALBEDO = albedo.rgb * albedo_tex.rgb;
+
+	float metallic_tex = dot(triplanar_texture(texture_metallic, uv1_power_normal, uv1_triplanar_pos), metallic_texture_channel);
+	METALLIC = metallic_tex * metallic;
+	SPECULAR = specular;
+
+	vec4 roughness_texture_channel = vec4(1.0, 0.0, 0.0, 0.0);
+	float roughness_tex = dot(triplanar_texture(texture_roughness, uv1_power_normal, uv1_triplanar_pos), roughness_texture_channel);
+	ROUGHNESS = roughness_tex * roughness;
+
+	// Normal Map: Enabled
+	NORMAL_MAP = triplanar_texture(texture_normal, uv1_power_normal, uv1_triplanar_pos).rgb;
+	NORMAL_MAP_DEPTH = normal_scale;
+
+	// Refraction: Enabled (with normal map texture)
+	vec3 unpacked_normal = NORMAL_MAP;
+	unpacked_normal.xy = unpacked_normal.xy * 2.0 - 1.0;
+	unpacked_normal.z = sqrt(max(0.0, 1.0 - dot(unpacked_normal.xy, unpacked_normal.xy)));
+	vec3 ref_normal = normalize(mix(
+			NORMAL,
+			TANGENT * unpacked_normal.x + BINORMAL * unpacked_normal.y + NORMAL * unpacked_normal.z,
+			NORMAL_MAP_DEPTH));
+	vec2 ref_ofs = SCREEN_UV - ref_normal.xy * dot(triplanar_texture(texture_refraction, uv1_power_normal, uv1_triplanar_pos), refraction_texture_channel) * refraction;
+
+	float ref_amount = 1.0 - albedo.a * albedo_tex.a;
+
+	float refraction_depth_tex = textureLod(depth_texture, ref_ofs, 0.0).r;
+	vec4 refraction_view_pos = INV_PROJECTION_MATRIX * vec4(SCREEN_UV * 2.0 - 1.0, refraction_depth_tex, 1.0);
+	refraction_view_pos.xyz /= refraction_view_pos.w;
+
+	// If the depth buffer is lower then the model's Z position, use the refracted UV, otherwise use the normal screen UV.
+	// At low depth differences, decrease refraction intensity to avoid sudden discontinuities.
+	EMISSION += textureLod(screen_texture, mix(SCREEN_UV, ref_ofs, smoothstep(0.0, 1.0, VERTEX.z - refraction_view_pos.z)), ROUGHNESS * 8.0).rgb * ref_amount * EXPOSURE;
+	ALBEDO *= 1.0 - ref_amount;
+	// Force transparency on the material (required for refraction).
+	ALPHA = 1.0;
+}
+"
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_di1ht"]
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_e0ree"]
+seamless = true
+as_normal_map = true
+bump_strength = 32.0
+noise = SubResource("FastNoiseLite_di1ht")
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_oshmb"]
+seamless = true
+as_normal_map = true
+bump_strength = 32.0
+noise = SubResource("FastNoiseLite_di1ht")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_e0ree"]
+render_priority = 0
+shader = SubResource("Shader_di1ht")
+shader_parameter/albedo = Color(0.0470588, 0.317647, 0.466667, 0.501961)
+shader_parameter/albedo_texture_size = Vector2i(0, 0)
+shader_parameter/point_size = 1.0
+shader_parameter/roughness = 0.1
+shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/specular = 0.5
+shader_parameter/metallic = 0.0
+shader_parameter/texture_refraction = SubResource("NoiseTexture2D_oshmb")
+shader_parameter/refraction = 0.05
+shader_parameter/refraction_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/texture_normal = SubResource("NoiseTexture2D_e0ree")
+shader_parameter/normal_scale = 1.0
+shader_parameter/uv1_blend_sharpness = 1.0
+shader_parameter/uv1_scale = Vector3(0.01, 0.01, 0.01)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)
+
+[sub_resource type="BoxMesh" id="BoxMesh_32ixm"]
+material = SubResource("ShaderMaterial_e0ree")
+
+[node name="Playing" type="Node3D"]
+script = ExtResource("1_4vsio")
+tileWidth = 10.0
+tileHeight = 10.0
+tileSpacing = 1.0
+
+[node name="TransitionCamera" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.729554, 0.683923, 0, -0.683923, 0.729554, 444.917, 123.125, 0)
+light_energy = 2.131
+directional_shadow_mode = 0
+sky_mode = 1
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1541i")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_di1ht")
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="Label" type="Label" parent="CanvasLayer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "Player One
+Left Boats:"
+
+[node name="Label2" type="Label" parent="CanvasLayer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 32
+text = "Player Two
+Left Boats:"
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/MarginContainer"]
+layout_mode = 2
+
+[node name="Label3" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 0
+theme_override_font_sizes/font_size = 26
+text = "Time Left: "
+
+[node name="Label4" type="Label" parent="CanvasLayer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 28
+horizontal_alignment = 1
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Panel" type="Panel" parent="CanvasLayer/MarginContainer/MarginContainer"]
+modulate = Color(1, 1, 1, 0.745098)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MarginContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/MarginContainer/MarginContainer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/MarginContainer/MarginContainer/MarginContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 28
+text = "Player 1 Boats"
+
+[node name="MarginContainer2" type="MarginContainer" parent="CanvasLayer/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 4
+
+[node name="Panel" type="Panel" parent="CanvasLayer/MarginContainer/MarginContainer2"]
+modulate = Color(1, 1, 1, 0.745098)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CanvasLayer/MarginContainer/MarginContainer2"]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="CanvasLayer/MarginContainer/MarginContainer2/MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 4
+
+[node name="Label" type="Label" parent="CanvasLayer/MarginContainer/MarginContainer2/MarginContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 28
+text = "Player 2 Boats"
+
+[node name="Save Button" type="Button" parent="CanvasLayer/MarginContainer"]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+text = "Save Game"
+
+[node name="GameMenuButton" type="TextureButton" parent="CanvasLayer/MarginContainer"]
+custom_minimum_size = Vector2(60, 60)
+layout_mode = 2
+size_flags_horizontal = 0
+size_flags_vertical = 8
+shortcut = SubResource("Shortcut_dbt5k")
+texture_normal = SubResource("AtlasTexture_32ixm")
+texture_pressed = SubResource("AtlasTexture_nk3gh")
+texture_hover = SubResource("AtlasTexture_cltlh")
+ignore_texture_size = true
+stretch_mode = 5
+
+[node name="GameMenu" type="CanvasLayer" parent="."]
+layer = 2
+visible = false
+
+[node name="Panel" type="Panel" parent="GameMenu"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_4v328")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GameMenu"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -169.0
+offset_top = -152.0
+offset_right = 169.0
+offset_bottom = 153.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+theme = ExtResource("2_di1ht")
+theme_override_constants/separation = 10
+
+[node name="Label" type="Label" parent="GameMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 50
+text = "Options"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="GameMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+theme_override_styles/separator = SubResource("StyleBoxEmpty_0n8lc")
+
+[node name="ResumeButton" type="Button" parent="GameMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Resume"
+
+[node name="SaveGameButton" type="Button" parent="GameMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Save Game"
+
+[node name="MainMenuButton" type="Button" parent="GameMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Main Menu"
+
+[node name="QuitButton" type="Button" parent="GameMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 30
+text = "Quit"
+
+[node name="HSeparator2" type="HSeparator" parent="GameMenu/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 15
+theme_override_styles/separator = SubResource("StyleBoxEmpty_0n8lc")
+
+[node name="Label2" type="Label" parent="GameMenu"]
+visible = false
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -28.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.787542, 4.16331e-06, 5.77569e-07, 1)
+theme_override_font_sizes/font_size = 20
+text = "Any unsaved changes will be lost!"
+horizontal_alignment = 1
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 20.0
+autostart = true
+
+[node name="Player1Grid" type="Node3D" parent="."]
+
+[node name="Camera3D" type="Camera3D" parent="Player1Grid"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
+
+[node name="Player2Grid" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 300, 0, 0)
+
+[node name="Camera3D2" type="Camera3D" parent="Player2Grid"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 100, 0)
+
+[node name="Water" type="MeshInstance3D" parent="."]
+transform = Transform3D(943.185, 0, 0, 0, 35.3025, 0, 0, 0, 429.708, 77.8681, -17.551, 0)
+mesh = SubResource("BoxMesh_32ixm")
+
+[connection signal="pressed" from="CanvasLayer/MarginContainer/Save Button" to="." method="_on_save_button_pressed"]
+[connection signal="pressed" from="CanvasLayer/MarginContainer/GameMenuButton" to="." method="_on_game_menu_button_pressed"]
+[connection signal="pressed" from="GameMenu/VBoxContainer/ResumeButton" to="." method="_on_game_menu_button_pressed"]
+[connection signal="pressed" from="GameMenu/VBoxContainer/SaveGameButton" to="." method="_on_save_button_pressed"]
+[connection signal="mouse_entered" from="GameMenu/VBoxContainer/MainMenuButton" to="." method="_on_danger_button_mouse_entered"]
+[connection signal="mouse_exited" from="GameMenu/VBoxContainer/MainMenuButton" to="." method="_on_danger_button_mouse_exited"]
+[connection signal="pressed" from="GameMenu/VBoxContainer/MainMenuButton" to="." method="_on_main_menu_button_pressed"]
+[connection signal="mouse_entered" from="GameMenu/VBoxContainer/QuitButton" to="." method="_on_danger_button_mouse_entered"]
+[connection signal="mouse_exited" from="GameMenu/VBoxContainer/QuitButton" to="." method="_on_danger_button_mouse_exited"]
+[connection signal="pressed" from="GameMenu/VBoxContainer/QuitButton" to="." method="_on_quit_button_pressed"]
+[connection signal="timeout" from="Timer" to="." method="_on_timer_timeout"]

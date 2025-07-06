@@ -1,0 +1,42 @@
+[gd_scene load_steps=5 format=3 uid="uid://fovuj5njx7w6"]
+
+[sub_resource type="GDScript" id="GDScript_neich"]
+script/source = "extends StaticBody3D
+class_name CustomTile
+
+@export var width: int
+@export var height: int
+@export var depth: int = 0.2
+@export var free: bool = true
+
+@onready var mesh = get_node(\"Mesh\")
+@onready var CollisionShape = get_node(\"CollisionShape3D\")
+
+# Called when the node enters the scene tree for the first time.
+func _ready() -> void:
+	await get_tree().process_frame
+	mesh.mesh.size = Vector3(height, depth, width)
+	CollisionShape.shape.size = Vector3(height, depth, width)
+	set_meta(\"material\", mesh.mesh.material)
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta: float) -> void:
+	pass
+"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mod1g"]
+albedo_color = Color(0.501961, 0.501961, 0.501961, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_6o8a3"]
+material = SubResource("StandardMaterial3D_mod1g")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3io6n"]
+
+[node name="CustomTile" type="StaticBody3D"]
+script = SubResource("GDScript_neich")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_6o8a3")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("BoxShape3D_3io6n")

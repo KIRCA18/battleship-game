@@ -1,0 +1,67 @@
+[gd_scene load_steps=4 format=3 uid="uid://crpjlnidyt8ty"]
+
+[ext_resource type="Theme" uid="uid://d4j2qqvqmtl6w" path="res://Military.tres" id="1_dkkag"]
+[ext_resource type="Script" uid="uid://brveonqvwfkmw" path="res://assets/scripts/history_card.gd" id="2_2e41x"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_dkkag"]
+bg_color = Color(0.0405031, 0.161183, 0.0806817, 1)
+corner_radius_top_left = 4
+corner_radius_top_right = 4
+corner_radius_bottom_right = 4
+corner_radius_bottom_left = 4
+
+[node name="PanelContainer" type="PanelContainer"]
+size_flags_horizontal = 0
+theme = ExtResource("1_dkkag")
+script = ExtResource("2_2e41x")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 2
+theme_override_styles/panel = SubResource("StyleBoxFlat_dkkag")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 8
+theme_override_constants/margin_bottom = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 60
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Player" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 23
+text = "Player 1 Won!"
+
+[node name="Points" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 15
+text = "2305.0 points"
+
+[node name="VBoxContainer2" type="VBoxContainer" parent="MarginContainer/HBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 0
+
+[node name="Date" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "04/07/2025 17:28"
+horizontal_alignment = 2
+
+[node name="Mode" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Player vs Computer"
+horizontal_alignment = 2
+
+[node name="Difficulty" type="Label" parent="MarginContainer/HBoxContainer/VBoxContainer2"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 14
+text = "Easy"
+horizontal_alignment = 2
